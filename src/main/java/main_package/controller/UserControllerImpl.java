@@ -32,4 +32,6 @@ public class UserControllerImpl implements UserController {
         UserData user = userService.getUserById(userId);
         return ResponseEntity.status(HttpStatus.OK).body(new UserGetResponse(user.name(), user.surname(), user.year()));
     }
+
+
 }
