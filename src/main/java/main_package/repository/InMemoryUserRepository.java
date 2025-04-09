@@ -1,17 +1,23 @@
 package main_package.repository;
 
+import main_package.exception.UserNotFoundException;
 import main_package.model.User;
 import main_package.model.UserData;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
+
 @Repository
 public class InMemoryUserRepository implements UserRepository {
 
-    public UserData userData = new UserData("Александр", "Мызников", 2006);
+    public HashMap<Long, UserData> userData = new HashMap<>() {{
+        put(1L, new UserData("Александр", "Мызников", 2006));
+    }};
 
     @Override
     public UserData getUserDataById(Long id) {
-        return userData;
+        if (!userData.containsKey(id)) throw new UserNotFoundException();
+        return userData.get(id);
     }
 
     @Override

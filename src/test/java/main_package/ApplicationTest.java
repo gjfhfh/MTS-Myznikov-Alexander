@@ -35,9 +35,6 @@ class ApplicationTest {
         ResponseEntity<UserGetResponse> response3 = restTemplate.getForEntity("http://localhost:" + port + "/" + "api/user/1", UserGetResponse.class);
         assertEquals(HttpStatus.OK, response3.getStatusCode());
         ResponseEntity<UserGetResponse> response4 = restTemplate.getForEntity("http://localhost:" + port + "/" + "api/user/2", UserGetResponse.class);
-        assertEquals(HttpStatus.BAD_REQUEST, response4.getStatusCode());
-        ResponseEntity<UserGetResponse> response5 = restTemplate.getForEntity("http://localhost:" + port + "/" + "api/user/2", UserGetResponse.class);
-        assertEquals(HttpStatus.NOT_FOUND, response5.getStatusCode());
-
+        assertEquals(HttpStatus.NOT_FOUND, response4.getStatusCode());
     }
 }
