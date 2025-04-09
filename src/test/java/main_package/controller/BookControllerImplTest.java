@@ -1,11 +1,14 @@
 package main_package.controller;
 
+import main_package.Application;
+import main_package.config.SecurityConfig;
 import main_package.model.BookData;
 import main_package.request.BookCreateRequest;
 import main_package.service.BookService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.http.MediaType;
@@ -21,6 +24,8 @@ import java.util.List;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = BookController.class)
+@ContextConfiguration(classes = {Application.class, SecurityConfig.class})
+
 class BookControllerImplTest {
     @Autowired
     private MockMvc mockMvc;
