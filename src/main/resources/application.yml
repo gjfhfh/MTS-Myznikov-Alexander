@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: "application"
+
+resilience4j:
+  ratelimiter:
+    instances:
+      apiRateLimiter:
+        limitForPeriod: 5
+        limitRefreshPeriod: 10s
