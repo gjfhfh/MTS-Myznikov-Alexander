@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 
 @RestController
 @RequestMapping("/api/book")
@@ -24,6 +25,7 @@ public class BookControllerImpl implements BookController {
         this.bookService = bookService;
     }
 
+    @RateLimiter(name = "apiRateLimiter")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<BookGetResponse>> getAllBooksById(@PathVariable Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(bookService.getAllBooksById(userId).stream()

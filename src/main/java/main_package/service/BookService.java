@@ -2,9 +2,13 @@ package main_package.service;
 
 import java.util.ArrayList;
 import lombok.extern.slf4j.Slf4j;
+import main_package.exception.CustomException;
 import main_package.model.BookData;
 import main_package.repository.BookRepository;
 import main_package.request.BookCreateRequest;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 
@@ -25,6 +29,7 @@ public class BookService {
         return courseId;
     }
 
+    @Cacheable(value = "books", key = "#userId")
     public ArrayList<BookData> getAllBooksById(Long userId) {
         log.info("Getting all books by id: {}", userId);
         ArrayList<BookData> books = bookRepository.getAllBooksById(userId);
@@ -33,5 +38,18 @@ public class BookService {
             log.info("{} - {}; ", book.title(), book.author());
         }
         return books;
+    }
+
+    @Retryable(value = CustomException.class, maxAttempts = 5, backoff = @Backoff(delay = 10000))
+    public Long createBookWithRetry(BookCreateRequest request) {
+        log.info("Creating book with title: {}", request.title());
+
+        if (Math.random() < 0.5) {
+            throw new CustomException("Failed to create book due to random failure.");
+        }
+
+        Long bookId = bookRepository.createBook(new BookData(request.title(), request.author(), request.year()));
+        log.info("Created book with id: {}", bookId);
+        return bookId;
     }
 }

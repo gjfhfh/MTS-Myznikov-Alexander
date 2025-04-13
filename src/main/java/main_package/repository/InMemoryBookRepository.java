@@ -4,6 +4,7 @@ import main_package.exception.BooksNotFoundException;
 import main_package.model.Book;
 import main_package.model.BookData;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,5 +28,10 @@ public class InMemoryBookRepository implements BookRepository {
     public Long createBook(BookData bookData) {
         Book book = new Book(52L, bookData);
         return 52L;
+    }
+
+    public String fetchRandomData() {
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.getForObject("https://random-data-api.com/api/users/random_user", String.class);
     }
 }

@@ -8,11 +8,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="MTSSem2" />
+        <module name="MTS-Myznikov-Alexander" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="MTS-Myznikov-Alexander" options="-parameters" />
       <module name="MTSSem2" options="-parameters" />
     </option>
   </component>

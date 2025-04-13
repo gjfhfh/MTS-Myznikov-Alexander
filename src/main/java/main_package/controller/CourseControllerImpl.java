@@ -2,6 +2,9 @@ package main_package.controller;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import main_package.request.CourseCreateRequest;
 import main_package.response.CourseGetResponse;
 import main_package.service.CourseService;
@@ -24,6 +27,8 @@ public class CourseControllerImpl implements CourseController {
         this.courseService = courseService;
     }
 
+    @RateLimiter(name = "apiRateLimiter")
+    @CircuitBreaker(name = "apiCircuitBreaker")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<CourseGetResponse>> getAllCoursesById(@PathVariable Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(courseService.getAllCoursesById(userId).stream()

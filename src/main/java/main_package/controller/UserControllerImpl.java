@@ -1,5 +1,6 @@
 package main_package.controller;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import main_package.model.UserData;
 import main_package.request.UserCreateRequest;
 import main_package.response.UserGetResponse;
@@ -27,6 +28,7 @@ public class UserControllerImpl implements UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
 
+    @CircuitBreaker(name = "apiCircuitBreaker")
     @GetMapping("/{userId}")
     public ResponseEntity<UserGetResponse> getUser(@PathVariable Long userId) {
         UserData user = userService.getUserById(userId);

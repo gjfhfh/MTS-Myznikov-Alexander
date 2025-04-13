@@ -1,5 +1,7 @@
 package main_package.aspect;
 
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -7,9 +9,16 @@ import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.time.Instant;
+
+@Getter
 @Aspect
 @Component
+@Slf4j
 public class LoggingAspect {
+
+    private int executionCount = 0;
 
     @After("execution(* main_package.controller..*(..))")
     public void logAfter(JoinPoint joinPoint) {
@@ -22,12 +31,15 @@ public class LoggingAspect {
         return joinPoint.proceed();
     }
 
-    @Around("execution(* main_package.controller..*(..))")
-    public Object measureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
-        long startTime = System.currentTimeMillis();
+    @Around("execution( * main_package.controller.*.*( .. ))")
+    public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+        executionCount++;
+        Instant timeBeforeExecution = Instant.now();
         Object result = joinPoint.proceed();
-        long duration = System.currentTimeMillis() - startTime;
-        System.out.println("Метод " + joinPoint.getSignature().getName() + " выполнен за " + duration + " мс");
+        Instant timeAfterExecution = Instant.now();
+        Duration duration = Duration.between(timeBeforeExecution, timeAfterExecution);
+        log.info("Время выполнения {}: {} ms", joinPoint.getSignature().getName(), duration.toMillis());
+        executionCount++;
         return result;
     }
 }
