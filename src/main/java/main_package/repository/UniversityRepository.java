@@ -1,10 +1,8 @@
 package main_package.repository;
 
 import main_package.model.University;
-import main_package.model.UniversityData;
-import main_package.model.UserData;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UniversityRepository {
-    UniversityData getUniversityById (Long id);
-    Long createUniversity (UniversityData university);
-}
+@Repository
+public interface UniversityRepository extends JpaRepository<University, Long> {}

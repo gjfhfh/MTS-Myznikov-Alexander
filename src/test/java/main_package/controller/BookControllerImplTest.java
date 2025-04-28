@@ -3,6 +3,7 @@ package main_package.controller;
 import main_package.Application;
 import main_package.config.SecurityConfig;
 import main_package.exception.BooksNotFoundException;
+import main_package.model.Book;
 import main_package.model.BookData;
 import main_package.request.BookCreateRequest;
 import main_package.service.BookService;
@@ -34,18 +35,18 @@ class BookControllerImplTest {
     @Test
     void getAllBooksById() throws Exception {
         Long mockId = 1L;
-        List<BookData> mockBookData = new ArrayList<BookData>();
-        mockBookData.add(new BookData("Тест", "Тест", 52));
-        when(bookService.getAllBooksById(mockId)).thenReturn((ArrayList<BookData>) mockBookData);
+        List<Book> mockBookData = new ArrayList<Book>();
+        mockBookData.add(new Book(new BookData("Тест", "Тест", 52), null));
+        when(bookService.getAllBooksById(mockId)).thenReturn((ArrayList<Book>) mockBookData);
 
         mockMvc.perform(get("http://localhost:8080/api/book/user/1")).andExpect(status().isOk());
     }
 
     @Test
     void addBookForUserById() throws Exception {
-        BookCreateRequest request = new BookCreateRequest("Тест", "Тест", 52);
-        when(bookService.createBook(request)).thenReturn(1L);
-
+        BookCreateRequest request = new BookCreateRequest("Тест", "Тест", 52, 52L);
+        Book book = new Book(new BookData("Тест", "Тест", 52), null);
+        when(bookService.createBook(request)).thenReturn(book);
         mockMvc.perform(get("http://localhost:8080/api/book/user/1")).andExpect(status().isOk());
     }
 
@@ -60,12 +61,12 @@ class BookControllerImplTest {
 
     @Test
     void addBookForUserById_BadRequest() throws Exception {
-        BookCreateRequest request = new BookCreateRequest("", "", 0); // Неверные данные
+        BookCreateRequest request = new BookCreateRequest("", "", 0, 51L); // Неверные данные
         doThrow(new IllegalArgumentException("Invalid book data")).when(bookService).createBook(request);
 
         mockMvc.perform(put("http://localhost:8080/api/book/user/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"title\":\"\", \"author\":\"\", \"year\":0}"))
+                        .content("{\"title\":\"\", \"author\":\"\", \"year\":0, \"userId\":51}"))
                 .andExpect(status().isBadRequest());
     }
 }

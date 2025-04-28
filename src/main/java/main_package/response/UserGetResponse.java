@@ -1,3 +1,5 @@
 package main_package.response;
 
-public record UserGetResponse(String name, String surname, int year) {}
+import main_package.model.University;
+
+public record UserGetResponse(String fullname, University university) {}

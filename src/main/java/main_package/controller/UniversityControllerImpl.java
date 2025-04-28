@@ -1,5 +1,6 @@
 package main_package.controller;
 
+import lombok.RequiredArgsConstructor;
 import main_package.model.UniversityData;
 import main_package.request.UniversityCreateRequest;
 import main_package.response.UniversityGetResponse;
@@ -15,24 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/university")
+@RequiredArgsConstructor
 public class UniversityControllerImpl implements UniversityController{
 
     private final UniversityService universityService;
 
-    public UniversityControllerImpl(UniversityService universityService) {
-        this.universityService = universityService;
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<UniversityGetResponse> getUniversityById(@PathVariable Long userId) {
-        UniversityData universityData = universityService.getUniversityById(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(new UniversityGetResponse(universityData.name(), universityData.location()));
-    }
-
-    @PutMapping("/user/{userId}")
-    public ResponseEntity<Void> addUniversityForUserById(
-            @PathVariable Long userId, @RequestBody UniversityCreateRequest university) {
-        universityService.createUniversity(university);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    @PutMapping("/creation")
+    public ResponseEntity<UniversityData> addUniversity(@RequestBody UniversityCreateRequest university) {
+        UniversityData universityData = universityService.createUniversity(university);
+        return ResponseEntity.status(HttpStatus.CREATED).body(universityData);
     }
 }

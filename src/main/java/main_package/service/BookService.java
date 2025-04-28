@@ -1,55 +1,44 @@
 package main_package.service;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main_package.exception.CustomException;
+import main_package.exception.UserNotFoundException;
+import main_package.model.Book;
 import main_package.model.BookData;
+import main_package.model.User;
 import main_package.repository.BookRepository;
+import main_package.repository.UserRepository;
 import main_package.request.BookCreateRequest;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class BookService {
 
     private final BookRepository bookRepository;
+    private final UserRepository userRepository;
 
-    public BookService(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
-
-    public Long createBook(BookCreateRequest request) {
+    public Book createBook(BookCreateRequest request) {
         log.info("Adding new book {} by {}", request.title(), request.author());
-        Long courseId = bookRepository.createBook(new BookData(request.title(), request.author(), request.year()));
-        log.info("Created new book with id: {}", courseId);
-        return courseId;
+        User user = userRepository.findById(request.userId()).orElseThrow(UserNotFoundException::new);
+        Book book = new Book(new BookData(request.title(), request.author(), request.year()), user);
+        bookRepository.save(book);
+        return book;
     }
 
     @Cacheable(value = "books", key = "#userId")
-    public ArrayList<BookData> getAllBooksById(Long userId) {
+    public List<Book> getAllBooksById(Long userId) {
         log.info("Getting all books by id: {}", userId);
-        ArrayList<BookData> books = bookRepository.getAllBooksById(userId);
-        log.info("Found books:");
-        for (BookData book : books) {
-            log.info("{} - {}; ", book.title(), book.author());
-        }
-        return books;
-    }
-
-    @Retryable(value = CustomException.class, maxAttempts = 5, backoff = @Backoff(delay = 10000))
-    public Long createBookWithRetry(BookCreateRequest request) {
-        log.info("Creating book with title: {}", request.title());
-
-        if (Math.random() < 0.5) {
-            throw new CustomException("Failed to create book due to random failure.");
-        }
-
-        Long bookId = bookRepository.createBook(new BookData(request.title(), request.author(), request.year()));
-        log.info("Created book with id: {}", bookId);
-        return bookId;
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        log.info("Successfully handled request for userId {}", userId);
+        return user.getBooks();
     }
 }

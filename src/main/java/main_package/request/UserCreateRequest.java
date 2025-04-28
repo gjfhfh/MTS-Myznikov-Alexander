@@ -1,3 +1,3 @@
 package main_package.request;
 
-public record UserCreateRequest(String name, String surname, int year) {}
+public record UserCreateRequest(String name, String surname, Long universityId) {}
