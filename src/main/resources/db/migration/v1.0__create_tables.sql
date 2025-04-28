@@ -6,7 +6,7 @@ CREATE TABLE universities(
 
 CREATE TABLE users(
   id bigserial PRIMARY KEY,
-  full_name VARCHAR(60) NOT NULL,
+  fullname VARCHAR(60) NOT NULL,
   university_id BIGINT REFERENCES universities(id)
 );
 

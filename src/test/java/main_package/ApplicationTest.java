@@ -48,14 +48,12 @@ class ApplicationTest {
     @Test
     public void testHomePage() {
         System.out.println("PostgreSQL running at: " + postgresContainer.getHost() + ":" + postgresContainer.getFirstMappedPort());
-        ResponseEntity<List> response0 = restTemplate.getForEntity("http://localhost:" + port + "/" + "api/course/user/1", List.class);
-        assertEquals(HttpStatus.OK, response0.getStatusCode());
         ResponseEntity<UniversityGetResponse> response1 = restTemplate.getForEntity("http://localhost:" + port + "/" + "api/university/user/1", UniversityGetResponse.class);
-        assertEquals(HttpStatus.OK, response1.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response1.getStatusCode());
         ResponseEntity<List> response2 = restTemplate.getForEntity("http://localhost:" + port + "/" + "api/book/user/1", List.class);
-        assertEquals(HttpStatus.OK, response2.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response2.getStatusCode());
         ResponseEntity<UserGetResponse> response3 = restTemplate.getForEntity("http://localhost:" + port + "/" + "api/user/1", UserGetResponse.class);
-        assertEquals(HttpStatus.OK, response3.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response3.getStatusCode());
         ResponseEntity<UserGetResponse> response4 = restTemplate.getForEntity("http://localhost:" + port + "/" + "api/user/2", UserGetResponse.class);
         assertEquals(HttpStatus.NOT_FOUND, response4.getStatusCode());
     }

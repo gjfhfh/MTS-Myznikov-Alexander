@@ -1,7 +1,13 @@
 package main_package.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main_package.model.UserData;
+import main_package.exception.UniversityNotFoundException;
+import main_package.exception.UserNotFoundException;
+import main_package.model.University;
+import main_package.model.UniversityData;
+import main_package.model.User;
+import main_package.repository.UniversityRepository;
 import main_package.repository.UserRepository;
 import main_package.request.UserCreateRequest;
 import org.springframework.scheduling.annotation.Async;
@@ -11,41 +17,38 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UniversityRepository universityRepository;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    public Long createUser (UserCreateRequest request) {
+    public User createUser (UserCreateRequest request) {
         log.info("Creating new user with username: {} {}", request.name(), request.surname());
-        Long userId = userRepository.createUser (new UserData(request.name(), request.surname(), request.year()));
-        log.info("Created new user with id: {}", userId);
-        return userId;
+        University university = universityRepository.findById(request.universityId()).orElseThrow(UniversityNotFoundException::new);
+        User user = new User(request.name() + request.surname(), university);
+        userRepository.save(user);
+        return user;
     }
 
-    public UserData getUserById(Long userId) {
+    public User getUserById(Long userId) {
         log.info("Getting user by id: {}", userId);
-        UserData user = userRepository.getUserDataById(userId);
-        log.info("Found user: {} {}", user.name(), user.surname());
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        log.info("Found user: {}", user.getFullName());
         return user;
     }
 
     @Async
-    public CompletableFuture<UserData> getUserByIdAsync(Long userId) {
+    public CompletableFuture<User> getUserByIdAsync(Long userId) {
         log.info("Asynchronously getting user by id: {}", userId);
-        UserData user = getUserById(userId);
+        User user = getUserById(userId);
         return CompletableFuture.completedFuture(user);
     }
 
-    public synchronized Long createUserExactlyOnce(UserCreateRequest request) {
-        log.info("Creating user exactly once with username: {} {}", request.name(), request.surname());
-
-        Long userId = userRepository.createUser (new UserData(request.name(), request.surname(), request.year()));
-
-        log.info("Created user exactly once with id: {}", userId);
-        return userId;
+    public UniversityData getUniversityById(Long userId) {
+        log.info("Getting university by id: {}", userId);
+        University university = userRepository.findById(userId).orElseThrow(UniversityNotFoundException::new).getUniversity();
+        log.info("Found university: {}", university.getUniversityData().getName());
+        return university.getUniversityData();
     }
 }

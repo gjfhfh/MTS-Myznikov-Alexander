@@ -2,6 +2,8 @@ package main_package.controller;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import lombok.RequiredArgsConstructor;
 import main_package.request.BookCreateRequest;
 import main_package.response.BookGetResponse;
 import main_package.service.BookService;
@@ -17,19 +19,16 @@ import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 
 @RestController
 @RequestMapping("/api/book")
+@RequiredArgsConstructor
 public class BookControllerImpl implements BookController {
 
     private final BookService bookService;
-
-    public BookControllerImpl(BookService bookService) {
-        this.bookService = bookService;
-    }
 
     @RateLimiter(name = "apiRateLimiter")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<BookGetResponse>> getAllBooksById(@PathVariable Long userId) {
         return ResponseEntity.status(HttpStatus.OK).body(bookService.getAllBooksById(userId).stream()
-                .map(bookData -> new BookGetResponse(bookData.title(), bookData.author(), bookData.year()))
+                .map(bookData -> new BookGetResponse(bookData.getBookData().getTitle(), bookData.getBookData().getAuthor(), bookData.getBookData().getYear()))
                 .collect(Collectors.toList()));
     }
 
